@@ -1,0 +1,153 @@
+# ============================================================
+# Python
+# ============================================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+*.pyc
+.Python
+
+# ============================================================
+# Entorno virtual
+# ============================================================
+.venv/
+venv/
+env/
+ENV/
+
+# ============================================================
+# Django
+# ============================================================
+*.log
+*.pot
+*.sqlite3
+db.sqlite3
+db.sqlite3-journal
+media/
+static/
+staticfiles/
+
+# Migraciones generadas (conserva __init__.py)
+# Descomenta si quieres ignorar migraciones
+# */migrations/*.py
+# !*/migrations/__init__.py
+
+# ============================================================
+# Variables de entorno
+# ============================================================
+.env
+.env.*
+!.env.example
+
+# ============================================================
+# Cobertura y tests
+# ============================================================
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+.pytest_cache/
+nosetests.xml
+test-results/
+
+# ============================================================
+# IDEs y editores
+# ============================================================
+
+# VSCode
+.vscode/
+*.code-workspace
+
+# PyCharm / JetBrains
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim / Neovim
+*.swp
+*.swo
+*~
+
+# Emacs
+\#*\#
+.\#*
+
+# ============================================================
+# Sistema operativo
+# ============================================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+.Spotlight-V100
+.Trashes
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# ============================================================
+# Archivos compilados y distribución
+# ============================================================
+dist/
+build/
+*.egg-info/
+*.egg
+.eggs/
+wheels/
+pip-wheel-metadata/
+MANIFEST
+
+# ============================================================
+# Postman
+# ============================================================
+*.postman_collection.json
+*.postman_environment.json
+
+# ============================================================
+# Archivos temporales y uploads locales
+# ============================================================
+*.tmp
+*.temp
+*.bak
+*.orig
+uploads/
+
+# ============================================================
+# Celery (si se agrega después)
+# ============================================================
+celerybeat-schedule
+celerybeat.pid
+
+# ============================================================
+# Docker (si se agrega después)
+# ============================================================
+.dockerignore
+
+# ============================================================
+# Incluir explícitamente
+# ============================================================
+!utilities.txt
+!README.md
+!.env.example
+!*/migrations/__init__.py

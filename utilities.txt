@@ -1,0 +1,43 @@
+Activar Postgresl
+sudo systemctl start postgresql
+sudo systemctl status postgresql
+sudo systemctl stop postgresql
+sudo systemctl restart postgresql
+
+Acceder a postgresql
+sudo -u postgres psql
+
+
+
+Verbos Comunes:
+feat: (Feature) Introduce una nueva funcionalidad.
+fix: Corrige un error o bug.
+docs: Cambios en documentación.
+style: Cambios de formato, espacios, etc., sin cambiar código.
+refactor: Mejora el código sin cambiar funcionalidad.
+test: Añade o corrige pruebas.
+chore: Mantenimiento, tareas de build, dependencias.
+remove: Elimina archivos o código. 
+
+Ejemplos:
+feat: add user authentication
+fix: resolve navigation bug
+docs: update README installation steps
+refactor: simplify layout logic 
+
+Consejos Adicionales:
+No termines el mensaje con un punto.
+Usa el primer verbo en mayúscula (ej: Add, Fix) si lo prefieres, pero mantén la consistencia.
+Escribe en inglés si el proyecto es internacional, o sigue el idioma del equipo. 
+
+
+
+
+MOSTRAR TODAS LAS RUTAS
+
+path('api/schema/', SpectacularAPIView.as_view(),                      name='schema'),
+path('api/docs/',   SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+
+
+Entra a:
+http://localhost:8000/api/docs/
