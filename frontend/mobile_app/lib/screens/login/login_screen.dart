@@ -1,8 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_app/screens/register/register_screen.dart';
+import 'package:mobile_app/services/auth_service.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+
+  bool loading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -76,46 +87,24 @@ class LoginScreen extends StatelessWidget {
 
                 // Input correo
                 TextField(
+                  controller: emailController,
                   style: const TextStyle(color: Colors.white),
-                  decoration: InputDecoration(
-                    hintText: "ejemplo@sensoria.ai",
-                    hintStyle: const TextStyle(color: Colors.white54),
-                    prefixIcon: const Icon(
-                      Icons.email,
-                      color: Colors.greenAccent,
-                    ),
-                    filled: true,
-                    fillColor: Colors.green.withOpacity(0.1),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
+                  decoration: _input("Correo", Icons.email),
                 ),
 
                 const SizedBox(height: 15),
 
                 // Input contraseña
                 TextField(
+                  controller: passwordController,
                   obscureText: true,
                   style: const TextStyle(color: Colors.white),
-                  decoration: InputDecoration(
-                    hintText: "Contraseña",
-                    hintStyle: const TextStyle(color: Colors.white54),
-                    prefixIcon: const Icon(
-                      Icons.lock,
-                      color: Colors.greenAccent,
-                    ),
-                    filled: true,
-                    fillColor: Colors.green.withOpacity(0.1),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
+                  decoration: _input("Contraseña", Icons.lock),
                 ),
 
                 const SizedBox(height: 25),
 
-                // 🔥 BOTÓN LOGIN (por ahora solo prueba)
+                // 🔥 BOTÓN LOGIN FUNCIONAL
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
@@ -123,19 +112,19 @@ class LoginScreen extends StatelessWidget {
                       backgroundColor: Colors.greenAccent,
                       padding: const EdgeInsets.symmetric(vertical: 15),
                     ),
-                    onPressed: () {
-                      print("Login presionado");
-                    },
-                    child: const Text(
-                      "Iniciar sesión",
-                      style: TextStyle(color: Colors.black),
-                    ),
+                    onPressed: loading ? null : _login,
+                    child: loading
+                        ? const CircularProgressIndicator(color: Colors.black)
+                        : const Text(
+                            "Iniciar sesión",
+                            style: TextStyle(color: Colors.black),
+                          ),
                   ),
                 ),
 
                 const SizedBox(height: 15),
 
-                // 🔥 BOTÓN REGISTRO (ESTE ES EL IMPORTANTE)
+                // 🔥 BOTÓN REGISTRO
                 TextButton(
                   onPressed: () {
                     Navigator.push(
@@ -155,6 +144,40 @@ class LoginScreen extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  // 🔥 FUNCIÓN LOGIN
+  Future<void> _login() async {
+    setState(() => loading = true);
+
+    final response = await AuthService.login(
+      emailController.text,
+      passwordController.text,
+    );
+
+    setState(() => loading = false);
+
+    if (response["success"]) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Bienvenido")));
+    } else {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(response["message"])));
+    }
+  }
+
+  // 🎨 INPUT ESTILO
+  InputDecoration _input(String hint, IconData icon) {
+    return InputDecoration(
+      hintText: hint,
+      hintStyle: const TextStyle(color: Colors.white54),
+      prefixIcon: Icon(icon, color: Colors.greenAccent),
+      filled: true,
+      fillColor: Colors.green.withOpacity(0.1),
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
     );
   }
 }
