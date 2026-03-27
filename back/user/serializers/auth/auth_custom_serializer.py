@@ -20,18 +20,19 @@ class CustomTokenObtainSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
         data = super().validate(attrs)
 
-        if not self.user.estado:
+        # Verificó correo pero un admin lo desactivó
+        if not self.user.estado and self.user.email_verifications.filter(is_verified=True).exists():
             raise serializers.ValidationError(
                 "Tu cuenta está desactivada. Contacta al administrador."
             )
 
+        # Nunca verificó el correo
         if not self.user.email_verifications.filter(is_verified=True).exists():
             raise serializers.ValidationError(
                 "Debes verificar tu correo antes de iniciar sesión."
             )
 
         return data
-
 
 class LogoutSerializer(serializers.Serializer):
     """Recibe el refresh token y lo añade a la blacklist."""

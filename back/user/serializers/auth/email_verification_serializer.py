@@ -5,18 +5,17 @@ from user.models.email_verification_model import EmailVerification
 
 
 class EmailVerificationSerializer(serializers.Serializer):
-    code = serializers.CharField(max_length=6, min_length=6)
+    email = serializers.EmailField()               # <-- identifica al usuario
+    code  = serializers.CharField(max_length=6, min_length=6)
 
     def validate(self, data):
-        user = self.context['request'].user
-
         try:
-            verification = EmailVerification.objects.get(
-                user=user,
+            verification = EmailVerification.objects.select_related('user').get(
+                user__email=data['email'],
                 is_used=False,
             )
         except EmailVerification.DoesNotExist:
-            raise serializers.ValidationError("No hay verificación activa.")
+            raise serializers.ValidationError("No hay verificación activa para este correo.")
 
         if verification.is_expired():
             raise serializers.ValidationError("El código ha expirado.")
