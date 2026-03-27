@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 class BinModel {
   final int id;
   final String color;
@@ -16,12 +18,22 @@ class BinModel {
   factory BinModel.fromJson(Map<String, dynamic> json) {
     return BinModel(
       id: json['id'] as int,
-      color: json['color'] as String,
-      location: json['location'] as String,
-      status: json['status'] as String,
-      createdAt: DateTime.parse(json['created_at']),
+
+      // 🔥 DEFENSIVO (evita null crash)
+      color: json['color']?.toString() ?? '',
+      location: json['location']?.toString() ?? '',
+      status: json['status']?.toString() ?? 'inactive',
+
+      // 🔥 DEFENSIVO para fechas
+      createdAt:
+          DateTime.tryParse(json['created_at'] ?? '') ?? DateTime.now(),
     );
   }
 
   bool get isActive => status == 'active';
+
+  String get createdAtFormatted {
+    final local = createdAt.toLocal();
+    return DateFormat('dd/MM/yyyy HH:mm').format(local);
+  }
 }

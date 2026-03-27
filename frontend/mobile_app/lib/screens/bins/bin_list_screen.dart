@@ -14,9 +14,9 @@ class BinListScreen extends StatefulWidget {
 }
 
 class _BinListScreenState extends State<BinListScreen> {
-  List<BinModel> bins    = [];
-  bool           loading = true;
-  String         search  = '';
+  List<BinModel> bins = [];
+  bool loading = true;
+  String search = '';
 
   @override
   void initState() {
@@ -26,12 +26,15 @@ class _BinListScreenState extends State<BinListScreen> {
 
   Future<void> _load() async {
     setState(() => loading = true);
+
     final token = context.read<AuthProvider>().accessToken!;
-    final res   = await BinService.getBins(token);
+    final res = await BinService.getBins(token);
+
+    if (!mounted) return;
 
     if (res['success']) {
       setState(() {
-        bins    = (res['data'] as List)
+        bins = (res['data'] as List)
             .map((e) => BinModel.fromJson(e))
             .toList();
         loading = false;
@@ -49,8 +52,9 @@ class _BinListScreenState extends State<BinListScreen> {
         title: const Text("Eliminar caneca",
             style: TextStyle(color: Colors.white)),
         content: Text(
-            "¿Eliminar la caneca ${bin.color} en ${bin.location ?? 'sin ubicación'}?",
-            style: const TextStyle(color: Colors.white70)),
+          "¿Eliminar la caneca ${bin.color} en ${bin.location}?",
+          style: const TextStyle(color: Colors.white70),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -69,34 +73,36 @@ class _BinListScreenState extends State<BinListScreen> {
     if (confirm != true) return;
 
     final token = context.read<AuthProvider>().accessToken!;
-    final res   = await BinService.deleteBin(bin.id, token);
+    final res = await BinService.deleteBin(bin.id, token);
 
     if (!mounted) return;
 
     if (res['success']) {
       setState(() => bins.removeWhere((b) => b.id == bin.id));
       ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Caneca eliminada.")));
+        const SnackBar(content: Text("Caneca eliminada.")),
+      );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("No se pudo eliminar.")));
+        const SnackBar(content: Text("No se pudo eliminar.")),
+      );
     }
   }
 
   List<BinModel> get _filtered => bins.where((b) =>
       b.color.toLowerCase().contains(search.toLowerCase()) ||
-      (b.location ?? '').toLowerCase().contains(search.toLowerCase())).toList();
+      b.location.toLowerCase().contains(search.toLowerCase())).toList();
 
   Color _colorFromName(String name) {
     final map = {
-      'rojo': Colors.red,       'red': Colors.red,
-      'azul': Colors.blue,      'blue': Colors.blue,
-      'verde': Colors.green,    'green': Colors.green,
-      'amarillo': Colors.amber, 'yellow': Colors.amber,
-      'gris': Colors.grey,      'gray': Colors.grey,
-      'negro': Colors.black87,  'black': Colors.black87,
-      'blanco': Colors.white,   'white': Colors.white,
-      'naranja': Colors.orange, 'orange': Colors.orange,
+      'rojo': Colors.red,
+      'azul': Colors.blue,
+      'verde': Colors.green,
+      'amarillo': Colors.amber,
+      'gris': Colors.grey,
+      'negro': Colors.black87,
+      'blanco': Colors.white,
+      'naranja': Colors.orange,
     };
     return map[name.toLowerCase()] ?? Colors.greenAccent;
   }
@@ -109,8 +115,8 @@ class _BinListScreenState extends State<BinListScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.greenAccent),
-        title: const Text("Canecas",
-            style: TextStyle(color: Colors.white)),
+        title:
+            const Text("Canecas", style: TextStyle(color: Colors.white)),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh, color: Colors.greenAccent),
@@ -119,149 +125,69 @@ class _BinListScreenState extends State<BinListScreen> {
           IconButton(
             icon: const Icon(Icons.add, color: Colors.greenAccent),
             onPressed: () async {
-              await Navigator.push(context,
-                  MaterialPageRoute(
-                      builder: (_) => const BinCreateScreen()));
-              _load();
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const BinCreateScreen(),
+                ),
+              );
+              if (result == true) _load();
             },
           ),
         ],
       ),
-      body: Column(children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-          child: TextField(
-            style: const TextStyle(color: Colors.white),
-            decoration: InputDecoration(
-              hintText:   "Buscar por color o ubicación...",
-              hintStyle:  const TextStyle(color: Colors.white38),
-              prefixIcon: const Icon(Icons.search,
-                  color: Colors.greenAccent),
-              filled:    true,
-              fillColor: Colors.green.withOpacity(0.08),
-              border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: TextField(
+              onChanged: (v) => setState(() => search = v),
+              style: const TextStyle(color: Colors.white),
+              decoration: InputDecoration(
+                hintText: "Buscar...",
+                hintStyle: const TextStyle(color: Colors.white38),
+                filled: true,
+                fillColor: Colors.green.withOpacity(0.08),
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12)),
+              ),
             ),
-            onChanged: (v) => setState(() => search = v),
           ),
-        ),
-
-        const SizedBox(height: 8),
-
-        Expanded(
-          child: loading
-              ? const Center(
-                  child: CircularProgressIndicator(
-                      color: Colors.greenAccent))
-              : _filtered.isEmpty
-                  ? const Center(
-                      child: Text("Sin canecas registradas.",
-                          style: TextStyle(color: Colors.white54)))
-                  : RefreshIndicator(
-                      onRefresh: _load,
-                      color: Colors.greenAccent,
-                      child: ListView.separated(
-                        padding: const EdgeInsets.all(16),
-                        itemCount: _filtered.length,
-                        separatorBuilder: (_, __) =>
-                            const SizedBox(height: 8),
-                        itemBuilder: (_, i) {
-                          final bin = _filtered[i];
-                          return GestureDetector(
-                            onTap: () async {
-                              await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) =>
-                                      BinDetailScreen(binId: bin.id),
-                                ),
-                              );
-                              _load();
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.all(14),
-                              decoration: BoxDecoration(
-                                color: Colors.green.withOpacity(0.08),
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                    color: Colors.greenAccent
-                                        .withOpacity(0.15)),
-                              ),
-                              child: Row(children: [
-                                Container(
-                                  width: 40, height: 40,
-                                  decoration: BoxDecoration(
-                                    color: _colorFromName(bin.color)
-                                        .withOpacity(0.3),
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                        color: _colorFromName(bin.color),
-                                        width: 2),
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(bin.color,
-                                          style: const TextStyle(
-                                              color: Colors.white,
-                                              fontWeight:
-                                                  FontWeight.w600)),
-                                      Text(
-                                        bin.location ?? 'Sin ubicación',
-                                        style: const TextStyle(
-                                            color: Colors.white54,
-                                            fontSize: 12),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.end,
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 8, vertical: 3),
-                                      decoration: BoxDecoration(
-                                        color: bin.isActive
-                                            ? Colors.green.withOpacity(0.2)
-                                            : Colors.red.withOpacity(0.2),
-                                        borderRadius:
-                                            BorderRadius.circular(20),
-                                      ),
-                                      child: Text(
-                                        bin.isActive
-                                            ? "Activa"
-                                            : "Inactiva",
-                                        style: TextStyle(
-                                            color: bin.isActive
-                                                ? Colors.greenAccent
-                                                : Colors.redAccent,
-                                            fontSize: 10),
-                                      ),
-                                    ),
-                                    IconButton(
-                                      icon: const Icon(
-                                          Icons.delete_outline,
-                                          color: Colors.redAccent,
-                                          size: 20),
-                                      onPressed: () => _delete(bin),
-                                    ),
-                                  ],
-                                ),
-                              ]),
+          Expanded(
+            child: loading
+                ? const Center(
+                    child: CircularProgressIndicator())
+                : ListView.builder(
+                    itemCount: _filtered.length,
+                    itemBuilder: (_, i) {
+                      final bin = _filtered[i];
+                      return ListTile(
+                        title: Text(bin.color,
+                            style: const TextStyle(color: Colors.white)),
+                        subtitle: Text(bin.location,
+                            style:
+                                const TextStyle(color: Colors.white54)),
+                        onTap: () async {
+                          await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) =>
+                                  BinDetailScreen(binId: bin.id),
                             ),
                           );
+                          _load();
                         },
-                      ),
-                    ),
-        ),
-      ]),
+                        trailing: IconButton(
+                          icon: const Icon(Icons.delete,
+                              color: Colors.redAccent),
+                          onPressed: () => _delete(bin),
+                        ),
+                      );
+                    },
+                  ),
+          ),
+        ],
+      ),
     );
   }
 }
