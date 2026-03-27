@@ -2,15 +2,24 @@ from django.contrib.auth.models import Permission
 
 
 PERMISOS_ADMIN = [
+    # usuarios
     "ver_usuario",
     "editar_usuario",
     "desactivar_usuario",
     "ver_reportes",
+    # bin
+    "ver_bin",
+    "crear_bin",
+    "editar_bin",
+    "eliminar_bin",
 ]
 
 PERMISOS_USUARIO = [
+    # usuarios
     "ver_usuario",
     "crear_registro",
+    # bin
+    "ver_bin",
 ]
 
 

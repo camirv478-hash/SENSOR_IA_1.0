@@ -41,3 +41,42 @@ path('api/docs/',   SpectacularSwaggerView.as_view(url_name='schema'), name='swa
 
 Entra a:
 http://localhost:8000/api/docs/
+
+
+from django.contrib.auth import get_user_model
+from user.models.email_verification_model import EmailVerification
+from django.utils import timezone
+
+User = get_user_model()
+
+user = User.objects.get(username='admin')  # 👈 usar el existente
+
+# convertirlo en admin real
+user.is_staff = True
+user.is_superuser = True
+user.rol = User.Rol.ADMIN
+user.save()
+
+# crear o actualizar verificación
+EmailVerification.objects.update_or_create(
+    user=user,
+    defaults={
+        'code': '000000',
+        'expires_at': timezone.now(),
+        'is_used': True,
+        'is_verified': True,
+        'verified_at': timezone.now(),
+    }
+)
+
+print("Admin corregido y verificado correctamente")
+
+
+
+from user.models.user_model import User
+from user.permissions.assign_permissions import asignar_permisos_por_rol
+
+user = User.objects.get(email='admin@admin.com')
+print(user.get_all_permissions())  # ver permisos actuales
+asignar_permisos_por_rol(user)     # asignar según su rol
+print(user.get_all_permissions())  # verificar que quedaron

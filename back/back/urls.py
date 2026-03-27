@@ -29,6 +29,7 @@ urlpatterns = [
     #===========================================================================
     path('admin/', admin.site.urls),
     path('user/', include('user.urls')),
+    path('bin/', include('bin.urls')),
 
 
 

@@ -1,8 +1,16 @@
 import 'package:flutter/material.dart';
-import 'screens/login/login_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:mobile_app/core/theme/app_theme.dart';
+import 'package:mobile_app/providers/auth_provider.dart';
+import 'package:mobile_app/screens/login/login_screen.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => AuthProvider(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -10,9 +18,10 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: LoginScreen(),
+      theme: AppTheme.theme,
+      home: const LoginScreen(),
     );
   }
 }

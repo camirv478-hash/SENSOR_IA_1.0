@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'storages',
     'corsheaders',
     'user.apps.UserConfig',
+    'bin.apps.BinConfig',
     'django_filters',
     'drf_spectacular',
     'rest_framework_simplejwt',

@@ -2,7 +2,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework import status
 
 from user.filters import UserFilter
@@ -20,7 +20,7 @@ from user.serializers.username_change_serializer import UsernameChangeSerializer
 
 class UserRegisterView(APIView):
     permission_classes = [AllowAny]
-    parser_classes     = [MultiPartParser, FormParser]
+    parser_classes     = [MultiPartParser, FormParser, JSONParser]
 
     def post(self, request):
         serializer = UserCreateSerializer(
@@ -39,7 +39,7 @@ class UserRegisterView(APIView):
 
 class UserMeView(APIView):
     permission_classes = [IsAuthenticated]
-    parser_classes     = [MultiPartParser, FormParser]
+    parser_classes     = [MultiPartParser, FormParser, JSONParser]
 
     def get(self, request):
         return Response(UserReadSerializer(request.user).data)
@@ -58,6 +58,7 @@ class UserMeView(APIView):
 
 class UsernameChangeView(APIView):
     permission_classes = [IsAuthenticated]
+    parser_classes =  [MultiPartParser, FormParser, JSONParser]
 
     def patch(self, request):
         serializer = UsernameChangeSerializer(
@@ -74,6 +75,7 @@ class UsernameChangeView(APIView):
 
 class UserListView(APIView):
     permission_classes = [IsAuthenticated, IsAdministrativo]
+    parser_classes     = [MultiPartParser, FormParser, JSONParser]
 
     def get(self, request):
         queryset  = User.objects.all().order_by('-fecha_creacion')
@@ -82,9 +84,22 @@ class UserListView(APIView):
             queryset = filterset.qs
         return Response(UserAdminReadSerializer(queryset, many=True).data)
 
+    def post(self, request):
+        serializer = UserCreateSerializer(
+            data    = request.data,
+            context = {'request': request},
+        )
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+        return Response(
+            UserAdminReadSerializer(user).data,
+            status = status.HTTP_201_CREATED,
+        )
+
 
 class UserDetailView(APIView):
     permission_classes = [IsAuthenticated, IsAdministrativo]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
 
     def _get_user(self, pk):
         try:
@@ -132,3 +147,26 @@ class UserDetailView(APIView):
             )
         user.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+class UserListView(APIView):
+    permission_classes = [IsAuthenticated, IsAdministrativo]
+    parser_classes     = [MultiPartParser, FormParser, JSONParser]
+
+    def get(self, request):
+        queryset  = User.objects.all().order_by('-fecha_creacion')
+        filterset = UserFilter(request.GET, queryset=queryset)
+        if filterset.is_valid():
+            queryset = filterset.qs
+        return Response(UserAdminReadSerializer(queryset, many=True).data)
+
+    def post(self, request):
+        serializer = UserCreateSerializer(
+            data    = request.data,
+            context = {'request': request},
+        )
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+        return Response(
+            UserAdminReadSerializer(user).data,
+            status = status.HTTP_201_CREATED,
+        )
