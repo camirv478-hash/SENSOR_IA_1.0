@@ -1,0 +1,2 @@
+from .role_permissions import IsAdministrativo
+from .assign_permissions import asignar_permisos_por_rol
