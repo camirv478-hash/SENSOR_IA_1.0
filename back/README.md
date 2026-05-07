@@ -211,13 +211,18 @@ GET	/bin/	Listar canecas
 
  Evidencias
 Login
-https://screenshots/login.png
+<img width="300" height="720" alt="image" src="https://github.com/user-attachments/assets/ce8e9470-a785-4b51-99c3-e9beb1af59ab" />
+
 
 Dashboard
-https://screenshots/dashboard.png
+
+Registro
+<img width="300" height="720" alt="image" src="https://github.com/user-attachments/assets/912ff2f8-3897-4783-82d3-b466f7013ac6" />
+
 
 Escaneo con IA
-https://screenshots/scan.png
+<img width="300" height="720" alt="image" src="https://github.com/user-attachments/assets/dfd17c62-0672-49c2-82fe-2c69c7ec5d8a" />
+
 
 Historial
 https://screenshots/history.png
